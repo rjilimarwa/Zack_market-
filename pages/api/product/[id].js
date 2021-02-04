@@ -25,3 +25,4 @@ const getProduct = async (req, res) => {
         return res.status(500).json({err: err.message})
     }
 }
+
