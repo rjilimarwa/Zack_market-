@@ -5,13 +5,15 @@ import CartItem from '../components/CartItem'
 import Link from 'next/link'
 import { getData, postData } from '../utils/fetchData'
 import { useRouter } from 'next/router'
-
+import paypalBTn from '../components/paypalBTn'
 
 const Cart = () => {
     const { state, dispatch } = useContext(DataContext)
     const { cart, auth} = state
-
     const [total, setTotal] = useState(0)
+    const [address,setAddress]=useState('')
+    const [mobile,setMobile]=useState('')
+    const [payment,setPayment]=useState('false')
     const router = useRouter()
 
     useEffect(() => {
@@ -48,7 +50,11 @@ const Cart = () => {
         updateCart()
     }
 })
-
+     const handlePayment=()=>{
+        if(!address ||!mobile)
+            return dispatch({type:'NOTIFY',payload:{error:'please add your adress and mobile'}})
+             setPayment(true)
+      }
     if( cart.length === 0 )
         return <img className="img-responsive w-100" src="/empty_cart.jpg" alt="not empty"/>
 
@@ -78,21 +84,36 @@ const Cart = () => {
 
         <label htmlFor="address">Address</label>
         <input type="text" name="address" id="address"
-    className="form-control mb-2"
+        value={address}
+        onChange={()=>{setAddress(e.target.value)}}
+       className="form-control mb-2"
     />
 
 <label htmlFor="mobile">Mobile</label>
         <input type="text" name="mobile" id="mobile"
-    className="form-control mb-2"
+        value={mobile}
+        onChange={()=>{setMobile(e.target.value)}}
+        className="form-control mb-2"
    />
 </form>
 
     <h3>Total: <span className="text-danger">${total}</span></h3>
-
-
+        {payment
+        ?<paypalBtn
+         total={total}
+         address={address}
+         mobile={mobile}
+         state={state}
+         dispatch={dispatch}
+        />
+        :
         <Link href={auth.user ? '#!' : '/signin'}>
-<a className="btn btn-dark my-2" onClick={handlePayment}>Proceed with payment</a>
-    </Link>
+         <a className="btn btn-dark my-2" onClick={handlePayment}>Proceed with payment</a>
+        </Link>
+
+        }
+
+
 
     </div>
     </div>
